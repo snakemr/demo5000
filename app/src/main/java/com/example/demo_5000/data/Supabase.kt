@@ -2,6 +2,7 @@ package com.example.demo_5000.data
 
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.Postgrest
@@ -53,4 +54,21 @@ object Supabase {
         ?.get(NAME)
         ?.toString()
         ?.removeSurrounding("\"")
+
+    // выход из системы
+    suspend fun logout() = supabase.gotrue.logout()
+
+    // отправка кода подтверждения для сброса пароля
+    suspend fun sendOTP(mail: String) = supabase.gotrue.sendOtpTo(Email) {
+        email = mail
+    }
+
+    // проверка кода подтверждения
+    suspend fun checkOTP(mail: String, otp: String) =
+        supabase.gotrue.verifyEmailOtp(OtpType.Email.RECOVERY, mail, otp)
+
+    // сброс пароля
+    suspend fun resetPassword(pass: String) = supabase.gotrue.modifyUser {
+        password = pass
+    }
 }

@@ -28,6 +28,9 @@ class MainActivity : ComponentActivity() {
     private val screens = mapOf<Screen, @Composable AnimatedVisibilityScope.()->Unit>(
         Screen.SignUp to { SignUp() },
         Screen.Login to { LogIn() },
+        Screen.Forgot to { Forgot() },
+        Screen.OTP to { OTP() },
+        Screen.Reset to { Reset() },
         Screen.Home to { Home() }
     )
     override fun onCreate(savedInstanceState: Bundle?) {

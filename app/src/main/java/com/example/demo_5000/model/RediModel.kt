@@ -28,6 +28,14 @@ class RediModel(app: Application) : AndroidViewModel(app) {
     var password by mutableStateOf(prefs.getString(PASS, null)?.decode())   // сохраненный пароль
         private set
 
+    init {
+        login?.let { email ->
+            password?.let { pass ->
+                logIn(email, pass, store = false)
+            }
+        }
+    }
+
     private fun request(api: suspend ()->Unit) = viewModelScope.launch {
         processing = true
         runCatching {
@@ -52,6 +60,33 @@ class RediModel(app: Application) : AndroidViewModel(app) {
             if (store) putString(PASS, pass.encode())
         }.apply()
         screen = Screen.Home
+    }
+
+    fun sendOTP(email: String = login ?: "") = request {
+        Supabase.sendOTP(email)
+        screen = Screen.OTP
+    }
+
+    fun checkOTP(code: String) = request {
+        login?.let {
+            Supabase.checkOTP(it, code)
+            screen = Screen.Reset
+        }
+    }
+
+    fun resetPassword(pass: String) = request {
+        Supabase.resetPassword(pass)
+        password = null
+        prefs.edit().remove(PASS).apply()
+        screen = Screen.Login
+    }
+
+    fun logout() = request {
+        Supabase.logout()
+        login = null
+        password = null
+        prefs.edit().remove(LOGIN).remove(PASS).apply()
+        screen = Screen.Login
     }
 
     // криптография для пароля
