@@ -38,4 +38,19 @@ object Supabase {
             supabase.gotrue.modifyUser { phoneNumber = phone }
         }
     }
+
+    // авторизация пользователя
+    suspend fun logIn(mail: String, pass: String): String? {
+        supabase.gotrue.loginWith(Email) {
+            email = mail
+            password = pass
+        }
+        return userName()
+    }
+
+    private fun userName() = supabase.gotrue.currentUserOrNull()
+        ?.userMetadata
+        ?.get(NAME)
+        ?.toString()
+        ?.removeSurrounding("\"")
 }

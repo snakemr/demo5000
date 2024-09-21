@@ -20,14 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.demo_5000.model.LocalModel
 import com.example.demo_5000.model.RediModel
-import com.example.demo_5000.ui.screens.Screen
-import com.example.demo_5000.ui.screens.SignUp
+import com.example.demo_5000.ui.screens.*
 import com.example.demo_5000.ui.theme.Demo5000Theme
 
 class MainActivity : ComponentActivity() {
     private val rediModel by viewModels<RediModel>()  // модель данных
     private val screens = mapOf<Screen, @Composable AnimatedVisibilityScope.()->Unit>(
-        Screen.SignUp to { SignUp() }
+        Screen.SignUp to { SignUp() },
+        Screen.Login to { LogIn() },
+        Screen.Home to { Home() }
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
