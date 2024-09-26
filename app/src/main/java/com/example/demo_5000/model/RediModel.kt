@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.demo_5000.R
 import com.example.demo_5000.data.Supabase
 import com.example.demo_5000.ui.screens.Screen
 import kotlinx.coroutines.launch
@@ -17,6 +18,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 // Слой бизнес-логики. Модель данных. 21.09.2024, Светличный А.А.
 class RediModel(app: Application) : AndroidViewModel(app) {
     private val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val supabase = app.resources.run {
+        Supabase(getString(R.string.supabaseUrl), getString(R.string.supabaseKey))
+    }
 
     var screen by mutableStateOf(Screen.Login)        //  сообщение о последней ошибке
     var error by mutableStateOf<String?>(null)  //  текущий экран
@@ -47,12 +51,12 @@ class RediModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun signUp(name: String, phone: String, email: String, pass1: String) = request {
-        Supabase.signUp(name, phone, email, pass1)
+        supabase.signUp(name, phone, email, pass1)
         screen = Screen.Login
     }
 
     fun logIn(email: String, pass: String, store: Boolean) = request {
-        Supabase.logIn(email, pass)
+        supabase.logIn(email, pass)
         login = email
         password = pass
         prefs.edit().apply {
@@ -63,26 +67,26 @@ class RediModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun sendOTP(email: String = login ?: "") = request {
-        Supabase.sendOTP(email)
+        supabase.sendOTP(email)
         screen = Screen.OTP
     }
 
     fun checkOTP(code: String) = request {
         login?.let {
-            Supabase.checkOTP(it, code)
+            supabase.checkOTP(it, code)
             screen = Screen.Reset
         }
     }
 
     fun resetPassword(pass: String) = request {
-        Supabase.resetPassword(pass)
+        supabase.resetPassword(pass)
         password = null
         prefs.edit().remove(PASS).apply()
         screen = Screen.Login
     }
 
     fun logout() = request {
-        Supabase.logout()
+        supabase.logout()
         login = null
         password = null
         prefs.edit().remove(LOGIN).remove(PASS).apply()

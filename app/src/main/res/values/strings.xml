@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Demo-5000</string>
+    <string name="supabaseUrl" translatable="false">https://xsdviehjoqcbpsnucgfm.supabase.co</string>
+    <string name="supabaseKey" translatable="false">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzZHZpZWhqb3FjYnBzbnVjZ2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY2MjQ3MzUsImV4cCI6MjA0MjIwMDczNX0.A_t_a8_HQL0aA4EZmdjJ8JF-KW7estH48-KprVNVFvE</string>
 </resources>
