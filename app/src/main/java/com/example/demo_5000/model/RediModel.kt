@@ -8,8 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.demo_5000.R
+import com.example.demo_5000.data.City
 import com.example.demo_5000.data.Supabase
 import com.example.demo_5000.ui.screens.Screen
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.nio.charset.Charset
 import kotlin.io.encoding.Base64
@@ -30,6 +32,8 @@ class RediModel(app: Application) : AndroidViewModel(app) {
     var login by mutableStateOf(prefs.getString(LOGIN, null))     // сохранённое имя пользователя
         private set
     var password by mutableStateOf(prefs.getString(PASS, null)?.decode())   // сохраненный пароль
+        private set
+    var firstname by mutableStateOf("")
         private set
 
     init {
@@ -56,7 +60,7 @@ class RediModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun logIn(email: String, pass: String, store: Boolean) = request {
-        supabase.logIn(email, pass)
+        firstname = supabase.logIn(email, pass) ?: email
         login = email
         password = pass
         prefs.edit().apply {
@@ -68,6 +72,7 @@ class RediModel(app: Application) : AndroidViewModel(app) {
 
     fun sendOTP(email: String = login ?: "") = request {
         supabase.sendOTP(email)
+        login = email
         screen = Screen.OTP
     }
 
@@ -91,6 +96,24 @@ class RediModel(app: Application) : AndroidViewModel(app) {
         password = null
         prefs.edit().remove(LOGIN).remove(PASS).apply()
         screen = Screen.Login
+    }
+
+    fun cities(realtime: Boolean = false) = if (realtime)
+        supabase.cityFlow()
+    else flow {
+        emit(supabase.cities())
+    }
+
+    fun insert(name: String) = request {
+        supabase.insert(name)
+    }
+
+    fun delete(city: City) = request {
+        supabase.delete(city)
+    }
+
+    fun update(city: City) = request {
+        supabase.update(city)
     }
 
     // криптография для пароля

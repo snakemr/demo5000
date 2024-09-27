@@ -44,9 +44,9 @@ fun PinField(
         List(pinCount) { "" }.toMutableStateList()
     }
     for (i in 0..<pinCount) {
-        OutlinedTextField(pins[i], {
-            pins[i] = it.take(1)
-            if (it.isNotEmpty())
+        OutlinedTextField(pins[i], { num ->
+            pins[i] = num.take(1)
+            if (num.isNotEmpty())
                 if (i+1 < pinCount)
                     requesters[i+1].requestFocus()
                 else {
