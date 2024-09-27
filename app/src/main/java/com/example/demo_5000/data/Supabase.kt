@@ -18,6 +18,9 @@ import kotlinx.serialization.json.put
 // Слой работы с данными
 // Подключение к Supabase, функции регистрации, авторизации, сброса пароля пользователя
 // 21.09.2024, Светличный А.А.
+
+// *** Тестовый пользователь madworldskills@gmail.com, пароль 123456 ***
+
 class Supabase(url: String, key: String) {
     // подключение к удалённой базе данных
     private val supabase = createSupabaseClient(supabaseUrl = url, supabaseKey = key) {
