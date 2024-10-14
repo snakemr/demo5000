@@ -9,12 +9,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.demo_5000.R
 import com.example.demo_5000.data.City
+import com.example.demo_5000.data.Crypto
 import com.example.demo_5000.data.Supabase
 import com.example.demo_5000.ui.screens.Screen
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import java.nio.charset.Charset
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 // Слой бизнес-логики. Модель данных. 21.09.2024, Светличный А.А.
@@ -24,10 +23,12 @@ class RediModel(app: Application) : AndroidViewModel(app) {
         Supabase(getString(R.string.supabaseUrl), getString(R.string.supabaseKey))
     }
 
-    var screen by mutableStateOf(Screen.Login)        //  сообщение о последней ошибке
+    var screen by mutableStateOf(Screen.Start)        //  сообщение о последней ошибке
     var error by mutableStateOf<String?>(null)  //  текущий экран
     var processing by mutableStateOf(false)     //  идёт загрузка данных
         private set
+
+    private val iv = with(Crypto) { prefs.getString(IV, null).toIV() }
 
     var login by mutableStateOf(prefs.getString(LOGIN, null))     // сохранённое имя пользователя
         private set
@@ -118,13 +119,21 @@ class RediModel(app: Application) : AndroidViewModel(app) {
 
     // криптография для пароля
     @OptIn(ExperimentalEncodingApi::class)
-    private fun String.encode() = Base64.Mime.encode(toByteArray(Charset.defaultCharset()))
+    private fun String.encode() = with(Crypto) {
+        encode {
+            prefs.edit().putString(IV, it).apply()
+        }
+    }
+
     @OptIn(ExperimentalEncodingApi::class)
-    private fun String.decode() = Base64.Mime.decode(this).toString(Charset.defaultCharset())
+    private fun String.decode() = with(Crypto) {
+        runCatching { decode(iv) }.getOrElse { "" }
+    }
 
     companion object {
-        const val PREFS = "prefs"
-        const val LOGIN = "login"
-        const val PASS = "pass"
+        private const val PREFS = "prefs"
+        private const val LOGIN = "login"
+        private const val PASS = "pass"
+        private const val IV = "IV"
     }
 }
